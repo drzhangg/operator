@@ -1,8 +1,0 @@
-apiVersion: tg.my.domain/v1beta1
-kind: Learn
-metadata:
-  name: learn-sample
-spec:
-  image: nginx
-  replicas: 2
-  # Add fields here
