@@ -47,9 +47,18 @@ type RedisReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.11.0/pkg/reconcile
 func (r *RedisReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	logger := log.FromContext(ctx)
+	logger.Info("redis reconcile start")
 
-	// TODO(user): your logic here
+	redis := &appsv1beta1.Redis{}
+	err := r.Client.Get(context.TODO(), req.NamespacedName, redis)
+	if err != nil {
+		logger.Error(err,"get redis reconcile error")
+		return ctrl.Result{}, err
+	}
+
+	r.Client.Create()
+
 
 	return ctrl.Result{}, nil
 }
