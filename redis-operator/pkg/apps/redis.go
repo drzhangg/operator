@@ -3,21 +3,22 @@ package apps
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"redis-operator/api/v1beta1"
-	ctrl "sigs.k8s.io/controller-runtime"
 )
 
-func newRedis(req ctrl.Request) *v1beta1.Redis {
+func newRedis(cr *v1beta1.Redis) *v1beta1.Redis {
 	return &v1beta1.Redis{
 		TypeMeta: metav1.TypeMeta{
-			Kind:       "",
-			APIVersion: "",
+			Kind:       "StatefulSet",
+			APIVersion: "apps/v1",
 		},
 		ObjectMeta: metav1.ObjectMeta{
-			Name: ,
-			Namespace: "",
-			Labels:    nil,
+			Name:      cr.Name,
+			Namespace: cr.Namespace,
+			Labels:    newStatefulSetLabel(cr),
 		},
-		Spec:   v1beta1.RedisSpec{},
-		Status: v1beta1.RedisStatus{},
+		Spec: v1beta1.RedisSpec{
+			Image:    cr.Spec.Image,
+			Replicas: cr.Spec.Replicas,
+		},
 	}
 }

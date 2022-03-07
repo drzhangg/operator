@@ -57,7 +57,7 @@ func (r *RedisReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		return ctrl.Result{}, err
 	}
 
-	r.Client.Create()
+	//r.Client.Create(context.TODO(),)
 
 
 	return ctrl.Result{}, nil
