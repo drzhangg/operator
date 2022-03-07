@@ -5,7 +5,7 @@ import (
 	"redis-operator/api/v1beta1"
 )
 
-func newRedis(cr *v1beta1.Redis) *v1beta1.Redis {
+func NewRedisStateful(cr *v1beta1.Redis) *v1beta1.Redis {
 	return &v1beta1.Redis{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "StatefulSet",
