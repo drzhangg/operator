@@ -1,12 +1,12 @@
 # Build the manager binary
 FROM golang:1.17 as builder
 
-WORKDIR /workspace
+WORKDIR /operator
 # Copy the Go Modules manifests
 COPY go.mod go.mod
 COPY go.sum go.sum
 
-ENV GOPROXY=https://goproxy.cn,direct
+ENV GOPROXY=https://goproxy.cn
 # cache deps before building and copying source so that we don't need to re-download as much
 # and so that source changes don't invalidate our downloaded layer
 RUN go mod download
@@ -15,16 +15,17 @@ RUN go mod download
 COPY main.go main.go
 COPY api/ api/
 COPY controllers/ controllers/
+COPY pkg/ pkg/
 
 # Build
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o manager main.go
 
 # Use distroless as minimal base image to package the manager binary
 # Refer to https://github.com/GoogleContainerTools/distroless for more details
-FROM gcr.io/distroless/static:nonroot
-#FROM registry.access.redhat.com/ubi8/ubi-minimal:latest
+#FROM gcr.io/distroless/static:nonroot
+FROM registry.access.redhat.com/ubi8/ubi-minimal:latest
 WORKDIR /
-COPY --from=builder /workspace/manager .
+COPY --from=builder /operator/manager .
 USER 65532:65532
 
 ENTRYPOINT ["/manager"]
