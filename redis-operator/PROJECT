@@ -12,7 +12,7 @@ resources:
     namespaced: true
   controller: true
   domain: my.domain
-  group: apps
+  group: data
   kind: Redis
   path: redis-operator/api/v1beta1
   version: v1beta1

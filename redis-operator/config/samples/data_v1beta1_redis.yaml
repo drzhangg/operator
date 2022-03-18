@@ -1,4 +1,4 @@
-apiVersion: apps.my.domain/v1beta1
+apiVersion: data.my.domain/v1beta1
 kind: Redis
 metadata:
   name: redis-sample

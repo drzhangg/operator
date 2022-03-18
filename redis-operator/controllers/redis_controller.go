@@ -18,16 +18,13 @@ package controllers
 
 import (
 	"context"
-	v1 "k8s.io/api/apps/v1"
-	"k8s.io/apimachinery/pkg/api/errors"
-	"redis-operator/pkg/apps"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	appsv1beta1 "redis-operator/api/v1beta1"
+	datav1beta1 "redis-operator/api/v1beta1"
 )
 
 // RedisReconciler reconciles a Redis object
@@ -36,9 +33,9 @@ type RedisReconciler struct {
 	Scheme *runtime.Scheme
 }
 
-//+kubebuilder:rbac:groups=apps.my.domain,resources=redis,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=apps.my.domain,resources=redis/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=apps.my.domain,resources=redis/finalizers,verbs=update
+//+kubebuilder:rbac:groups=data.my.domain,resources=redis,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=data.my.domain,resources=redis/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=data.my.domain,resources=redis/finalizers,verbs=update
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -50,27 +47,9 @@ type RedisReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.11.0/pkg/reconcile
 func (r *RedisReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	logger := log.FromContext(ctx)
-	logger.Info("redis reconcile start")
+	_ = log.FromContext(ctx)
 
-	ctx = context.TODO()
-
-	redis := &appsv1beta1.Redis{}
-	err := r.Client.Get(ctx, req.NamespacedName, redis)
-	if err != nil {
-		logger.Error(err, "get redis reconcile error")
-		return ctrl.Result{}, err
-	}
-
-	sts := &v1.StatefulSet{}
-	if err := r.Client.Get(ctx, req.NamespacedName, sts); err != nil && errors.IsNotFound(err) {
-
-		// 创建statefulSet
-		newSts := apps.NewRedisStateful(redis)
-		if err := r.Client.Create(ctx, newSts); err != nil {
-			return ctrl.Result{}, err
-		}
-	}
+	// TODO(user): your logic here
 
 	return ctrl.Result{}, nil
 }
@@ -78,6 +57,6 @@ func (r *RedisReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 // SetupWithManager sets up the controller with the Manager.
 func (r *RedisReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&appsv1beta1.Redis{}).
+		For(&datav1beta1.Redis{}).
 		Complete(r)
 }

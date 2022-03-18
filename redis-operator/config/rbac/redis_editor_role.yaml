@@ -5,7 +5,7 @@ metadata:
   name: redis-editor-role
 rules:
 - apiGroups:
-  - apps.my.domain
+  - data.my.domain
   resources:
   - redis
   verbs:
@@ -17,7 +17,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - apps.my.domain
+  - data.my.domain
   resources:
   - redis/status
   verbs:

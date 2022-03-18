@@ -31,7 +31,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	appsv1beta1 "redis-operator/api/v1beta1"
+	datav1beta1 "redis-operator/api/v1beta1"
 	"redis-operator/controllers"
 	//+kubebuilder:scaffold:imports
 )
@@ -44,7 +44,7 @@ var (
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
-	utilruntime.Must(appsv1beta1.AddToScheme(scheme))
+	utilruntime.Must(datav1beta1.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
 
