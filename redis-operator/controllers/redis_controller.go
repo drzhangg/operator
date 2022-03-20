@@ -18,6 +18,10 @@ package controllers
 
 import (
 	"context"
+	v12 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	v1 "k8s.io/api/apps/v1"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -47,10 +51,62 @@ type RedisReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.11.0/pkg/reconcile
 func (r *RedisReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	ctx = context.TODO()
+
+	// v1:单机版
+	logger := log.FromContext(ctx)
+	logger.WithValues("redis", req.NamespacedName)
 
 	// TODO(user): your logic here
+	var redis datav1beta1.Redis
 
+	// 先查询是否创建过 redis 实例
+	if err := r.Get(ctx, req.NamespacedName, &redis); err != nil {
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
+
+	// 有redis实例，对statefulset进行创建或者更新
+	var sts v1.StatefulSet
+	or, err := ctrl.CreateOrUpdate(ctx, r.Client, &sts, func() error {
+		labels := map[string]string{
+			"app": redis.Name,
+		}
+		sts.Spec = v1.StatefulSetSpec{
+			Replicas: redis.Spec.Replicas,
+			Selector: &metav1.LabelSelector{
+				MatchLabels: labels,
+			},
+			Template: v12.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{},
+				Spec: v12.PodSpec{
+					Containers: []v12.Container{
+						{
+							Name:       "redis",
+							Image:      redis.Spec.Image,
+							Command:    nil,
+							Args:       nil,
+							WorkingDir: "",
+							Ports: []v12.ContainerPort{
+								v12.ContainerPort{
+									Name:          redis.Name,
+									ContainerPort: 6379,
+								},
+							},
+						},
+					},
+					RestartPolicy: v12.RestartPolicyAlways,
+				},
+			},
+			ServiceName: "",
+		}
+
+		return ctrl.SetControllerReference(&redis, &sts, &runtime.Scheme{})
+	})
+	if err != nil {
+
+		return ctrl.Result{}, err
+	}
+	logger.Info("CreateOrUpdate", "StatefulSet", or)
 	return ctrl.Result{}, nil
 }
 
