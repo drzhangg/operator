@@ -21,6 +21,9 @@ make generate
 make install  # or  kubectl apply -k config/crd/
 ```
 
+> 可以使用 `kubectl apply -k config/crd` 生成crd文件，但是当这样使用时
+> 如果你在type文件里修改了结构体字段，需要在config/crd/bases文件里手动添加这些字段
+
 
 #### 2.创建rbac
 ```shell

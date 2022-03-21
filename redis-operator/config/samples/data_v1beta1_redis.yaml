@@ -3,4 +3,6 @@ kind: Redis
 metadata:
   name: redis-sample
 spec:
+  image: redis:latest
+  replicas: 2
   # TODO(user): Add fields here
