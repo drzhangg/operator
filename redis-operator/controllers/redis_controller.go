@@ -18,10 +18,9 @@ package controllers
 
 import (
 	"context"
-	v12 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
 	v1 "k8s.io/api/apps/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
+	"redis-operator/pkg/statefulset"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -53,52 +52,20 @@ func (r *RedisReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 	var redis datav1beta1.Redis
 
 	// 先查询是否创建过 redis 实例
-	if err := r.Get(ctx, req.NamespacedName, &redis); err != nil {
+	if err := r.Client.Get(ctx, req.NamespacedName, &redis); err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	// 有redis实例，对statefulset进行创建或者更新
+	// 有redis实例，对statefulSet进行创建或者更新
 	var sts v1.StatefulSet
-	or, err := ctrl.CreateOrUpdate(ctx, r.Client, &sts, func() error {
-		labels := map[string]string{
-			"app": redis.Name,
+	if err := r.Client.Get(ctx, req.NamespacedName, &sts); err != nil && errors.IsNotFound(err) {
+		nsts := statefulset.NewStatefulSet(&redis)
+		if err := r.Client.Create(ctx, nsts); err != nil {
+			return ctrl.Result{}, err
 		}
-		sts.Spec = v1.StatefulSetSpec{
-			Replicas: redis.Spec.Replicas,
-			Selector: &metav1.LabelSelector{
-				MatchLabels: labels,
-			},
-			Template: v12.PodTemplateSpec{
-				ObjectMeta: metav1.ObjectMeta{},
-				Spec: v12.PodSpec{
-					Containers: []v12.Container{
-						{
-							Name:       "redis",
-							Image:      redis.Spec.Image,
-							Command:    nil,
-							Args:       nil,
-							WorkingDir: "",
-							Ports: []v12.ContainerPort{
-								v12.ContainerPort{
-									Name:          redis.Name,
-									ContainerPort: 6379,
-								},
-							},
-						},
-					},
-					RestartPolicy: v12.RestartPolicyAlways,
-				},
-			},
-			ServiceName: "",
-		}
-
-		return ctrl.SetControllerReference(&redis, &sts, &runtime.Scheme{})
-	})
-	if err != nil {
-
-		return ctrl.Result{}, err
+		return ctrl.Result{}, nil
 	}
-	logger.Info("CreateOrUpdate", "StatefulSet", or)
+
 	return ctrl.Result{}, nil
 }
 
