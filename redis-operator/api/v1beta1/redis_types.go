@@ -52,6 +52,7 @@ type Redis struct {
 }
 
 //+kubebuilder:object:root=true
+//+kubebuilder:resource:path=redisLists,scope=Cluster
 
 // RedisList contains a list of Redis
 type RedisList struct {

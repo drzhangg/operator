@@ -20,9 +20,8 @@ import (
 	"context"
 	v1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
-	"redis-operator/pkg/statefulset"
-
 	"k8s.io/apimachinery/pkg/runtime"
+	"redis-operator/pkg/deployment"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -57,10 +56,12 @@ func (r *RedisReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 	}
 
 	// 有redis实例，对statefulSet进行创建或者更新
-	var sts v1.StatefulSet
-	if err := r.Client.Get(ctx, req.NamespacedName, &sts); err != nil && errors.IsNotFound(err) {
-		nsts := statefulset.NewStatefulSet(&redis)
-		if err := r.Client.Create(ctx, nsts); err != nil {
+	//var sts v1.StatefulSet
+	var deploy v1.Deployment
+	if err := r.Client.Get(ctx, req.NamespacedName, &deploy); err != nil && errors.IsNotFound(err) {
+		//nsts := statefulset.NewStatefulSet(&redis)
+		ndeploy := deployment.NewDeployment(&redis)
+		if err := r.Client.Create(ctx, ndeploy); err != nil {
 			return ctrl.Result{}, err
 		}
 		return ctrl.Result{}, nil

@@ -15,8 +15,8 @@ func NewStatefulSet(redis *datav1beta1.Redis) *v12.StatefulSet {
 
 	return &v12.StatefulSet{
 		TypeMeta: metav1.TypeMeta{
-			Kind:       "apps/v1",
-			APIVersion: "StatefulSet",
+			APIVersion: "apps/v1",
+			Kind:       "StatefulSet",
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      redis.Name,
@@ -35,12 +35,14 @@ func NewStatefulSet(redis *datav1beta1.Redis) *v12.StatefulSet {
 				MatchLabels: labels,
 			},
 			Template: v1.PodTemplateSpec{
-				ObjectMeta: metav1.ObjectMeta{},
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: labels,
+				},
 				Spec: v1.PodSpec{
 					Containers: newContainers(redis),
 				},
 			},
-			ServiceName: "",
+			//ServiceName: "",
 		},
 	}
 }
