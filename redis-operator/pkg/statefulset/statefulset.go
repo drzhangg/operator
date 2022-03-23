@@ -58,7 +58,7 @@ func newContainers(redis *datav1beta1.Redis) []v1.Container {
 					ContainerPort: 6379,
 				},
 			},
-			ImagePullPolicy: v1.PullIfNotPresent,
+			ImagePullPolicy: v1.PullAlways,
 		},
 	}
 }

@@ -57,7 +57,7 @@ func (r *RedisReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	logger.Info("namespace", redis.Namespace)
+	//logger.Info("namespace", redis.Namespace)
 	fmt.Println("namespace::", redis.Namespace)
 
 	// 有redis实例，对statefulSet进行创建或者更新
