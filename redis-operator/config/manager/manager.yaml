@@ -25,7 +25,7 @@ spec:
         - /manager
         args:
         - --leader-elect
-        image: drzhangg/redis-operator:v2
+        image: drzhangg/redis-operator:v3
         name: redis-controller
         securityContext:
           allowPrivilegeEscalation: false

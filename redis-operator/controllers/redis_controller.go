@@ -18,10 +18,12 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	v1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
-	"redis-operator/pkg/deployment"
+	"redis-operator/pkg/service"
+	"redis-operator/pkg/statefulset"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -55,15 +57,25 @@ func (r *RedisReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
+	logger.Info("namespace", redis.Namespace)
+	fmt.Println("namespace::", redis.Namespace)
+
 	// 有redis实例，对statefulSet进行创建或者更新
-	//var sts v1.StatefulSet
-	var deploy v1.Deployment
-	if err := r.Client.Get(ctx, req.NamespacedName, &deploy); err != nil && errors.IsNotFound(err) {
-		//nsts := statefulset.NewStatefulSet(&redis)
-		ndeploy := deployment.NewDeployment(&redis)
-		if err := r.Client.Create(ctx, ndeploy); err != nil {
+	var sts v1.StatefulSet
+	//var deploy v1.Deployment
+	if err := r.Client.Get(ctx, req.NamespacedName, &sts); err != nil && errors.IsNotFound(err) {
+		nsts := statefulset.NewStatefulSet(&redis)
+
+		//ndeploy := deployment.NewDeployment(&redis)
+		if err := r.Client.Create(ctx, nsts); err != nil {
 			return ctrl.Result{}, err
 		}
+
+		nsrv := service.NewService(&redis)
+		if err := r.Client.Create(ctx, nsrv); err != nil {
+			return ctrl.Result{}, err
+		}
+
 		return ctrl.Result{}, nil
 	}
 

@@ -41,6 +41,7 @@ func NewStatefulSet(redis *datav1beta1.Redis) *v12.StatefulSet {
 				Spec: v1.PodSpec{
 					Containers: newContainers(redis),
 				},
+
 			},
 			//ServiceName: "",
 		},
