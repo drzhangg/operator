@@ -21,6 +21,9 @@ import (
 	"github.com/go-logr/logr"
 	v1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/util/json"
+	"nginx-operator/pkg/deployment"
+	service2 "nginx-operator/pkg/service"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	appv1beta1 "nginx-operator/api/v1beta1"
@@ -67,8 +70,32 @@ func (r *AppServiceReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 	//    如果需要更新，则直接更新
 	//    如果不需要更新，则正常返回
 	deploy := &v1.Deployment{}
-	if err := r.Get(ctx,req.NamespacedName,deploy);err !=nil && errors.IsNotFound(err){
+	if err := r.Get(ctx, req.NamespacedName, deploy); err != nil && errors.IsNotFound(err) {
+		// 1.创建deployment
+		deploy := deployment.NewDeploy(&appService)
+		if err := r.Client.Create(ctx, deploy); err != nil {
+			return ctrl.Result{}, err
+		}
 
+		// 2.创建service
+		svc := service2.NewService(&appService)
+		if err := r.Client.Create(ctx, svc); err != nil {
+			return ctrl.Result{}, err
+		}
+
+		// 3.关联Annotation
+		data, _ := json.Marshal(appService.Spec)
+		if appService.Annotations != nil {
+			appService.Annotations["spec"] = string(data)
+		} else {
+			appService.Annotations = map[string]string{"spec": string(data)}
+		}
+
+		if err := r.Client.Update(ctx, &appService); err != nil {
+			return ctrl.Result{}, err
+		}
+
+		return ctrl.Result{}, nil
 	}
 
 	// Reconcile successful - don't requeue
