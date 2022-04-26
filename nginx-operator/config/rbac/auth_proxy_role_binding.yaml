@@ -8,5 +8,5 @@ roleRef:
   name: proxy-role
 subjects:
 - kind: ServiceAccount
-  name: redis-sc
-  namespace: redis
+  name: controller-manager
+  namespace: system

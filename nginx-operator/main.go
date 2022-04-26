@@ -1,5 +1,5 @@
 /*
-Copyright 2022.
+Copyright 2022 drzhangg.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	chipv1beta1 "nginx-operator/api/v1beta1"
+	appv1beta1 "nginx-operator/api/v1beta1"
 	"nginx-operator/controllers"
 	//+kubebuilder:scaffold:imports
 )
@@ -44,7 +44,7 @@ var (
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
-	utilruntime.Must(chipv1beta1.AddToScheme(scheme))
+	utilruntime.Must(appv1beta1.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
 
@@ -71,18 +71,18 @@ func main() {
 		Port:                   9443,
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
-		LeaderElectionID:       "7e6cce16.my.domain",
+		LeaderElectionID:       "7e6cce16.drzhangg.io",
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
 		os.Exit(1)
 	}
 
-	if err = (&controllers.NginxReconciler{
+	if err = (&controllers.AppServiceReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "Nginx")
+		setupLog.Error(err, "unable to create controller", "controller", "AppService")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder

@@ -1,4 +1,4 @@
 ## Append samples you want in your CSV to this file as resources ##
 resources:
-- chip_v1beta1_nginx.yaml
+- app_v1beta1_appservice.yaml
 #+kubebuilder:scaffold:manifestskustomizesamples

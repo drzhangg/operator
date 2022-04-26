@@ -4,6 +4,7 @@ import (
 	v1 "k8s.io/api/apps/v1"
 	v12 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"redis-operator/api/v1beta1"
 )
 
@@ -20,6 +21,12 @@ func NewDeployment(redis *v1beta1.Redis) *v1.Deployment {
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      redis.Name,
 			Namespace: redis.Namespace,
+			OwnerReferences: []metav1.OwnerReference{
+				*metav1.NewControllerRef(redis,schema.GroupVersionKind{
+					Group:   v1beta1.GroupVersion.Group,
+					Version: v1beta1.GroupVersion.Version,
+				}),
+			},
 		},
 		Spec: v1.DeploymentSpec{
 			Replicas: redis.Spec.Replicas,

@@ -1,13 +1,13 @@
-# permissions for end users to edit nginxes.
+# permissions for end users to edit appservices.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: nginx-editor-role
+  name: appservice-editor-role
 rules:
 - apiGroups:
-  - chip.my.domain
+  - app.drzhangg.io
   resources:
-  - nginxes
+  - appservices
   verbs:
   - create
   - delete
@@ -17,8 +17,8 @@ rules:
   - update
   - watch
 - apiGroups:
-  - chip.my.domain
+  - app.drzhangg.io
   resources:
-  - nginxes/status
+  - appservices/status
   verbs:
   - get

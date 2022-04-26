@@ -1,9 +1,15 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    control-plane: controller-manager
+  name: system
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: redis-manager
-  namespace: redis
+  name: controller-manager
+  namespace: system
   labels:
     control-plane: controller-manager
 spec:
@@ -25,8 +31,8 @@ spec:
         - /manager
         args:
         - --leader-elect
-        image: drzhangg/redis-operator:v1
-        name: redis
+        image: controller:latest
+        name: manager
         securityContext:
           allowPrivilegeEscalation: false
         livenessProbe:
@@ -45,10 +51,10 @@ spec:
         # More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
         resources:
           limits:
-            cpu: 1G
-            memory: 500Mi
+            cpu: 500m
+            memory: 128Mi
           requests:
-            cpu: 1G
-            memory: 500Mi
-      serviceAccountName: redis-sc
+            cpu: 10m
+            memory: 64Mi
+      serviceAccountName: controller-manager
       terminationGracePeriodSeconds: 10

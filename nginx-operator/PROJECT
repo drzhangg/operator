@@ -1,4 +1,4 @@
-domain: my.domain
+domain: drzhangg.io
 layout:
 - go.kubebuilder.io/v3
 plugins:
@@ -11,9 +11,9 @@ resources:
     crdVersion: v1
     namespaced: true
   controller: true
-  domain: my.domain
-  group: chip
-  kind: Nginx
+  domain: drzhangg.io
+  group: app
+  kind: AppService
   path: nginx-operator/api/v1beta1
   version: v1beta1
 version: "3"
