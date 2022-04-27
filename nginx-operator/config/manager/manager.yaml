@@ -1,28 +1,21 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  labels:
-    control-plane: controller-manager
-  name: system
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: controller-manager
-  namespace: system
+  name: nginx-operator
+  namespace: default
   labels:
-    control-plane: controller-manager
+    control-plane: nginx-operator
 spec:
   selector:
     matchLabels:
-      control-plane: controller-manager
+      control-plane: nginx-operator
   replicas: 1
   template:
     metadata:
       annotations:
         kubectl.kubernetes.io/default-container: manager
       labels:
-        control-plane: controller-manager
+        control-plane: nginx-operator
     spec:
       securityContext:
         runAsNonRoot: true
@@ -31,7 +24,7 @@ spec:
         - /manager
         args:
         - --leader-elect
-        image: controller:latest
+        image: drzhangg/nginx-operator:v1.0.9
         name: manager
         securityContext:
           allowPrivilegeEscalation: false
@@ -56,5 +49,5 @@ spec:
           requests:
             cpu: 10m
             memory: 64Mi
-      serviceAccountName: controller-manager
+      serviceAccountName: nginx-operator
       terminationGracePeriodSeconds: 10

@@ -38,6 +38,12 @@ kubectl apply -k config/rbac  # 要注意提前修复对应文件里的ns和name
 
 
 #### 4.创建controller manager
+```shell
+kubectl apply -f config/manager/manager.yaml
+```
 
 
 #### 5.创建sample operator
+```shell
+kubectl apply -f config/samples/xxx.yaml
+```

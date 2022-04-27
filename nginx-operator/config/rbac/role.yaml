@@ -3,7 +3,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   creationTimestamp: null
-  name: manager-role
+  name: nginx-operator
 rules:
 - apiGroups:
   - app.drzhangg.io
@@ -31,3 +31,21 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+  - ""
+  resources:
+  - "*"
+  verbs:
+  - "*"
+- apiGroups:
+    - "coordination.k8s.io"
+  resources:
+    - "*"
+  verbs:
+    - "*"
+- apiGroups:
+    - "apps"
+  resources:
+    - "*"
+  verbs:
+    - "*"
