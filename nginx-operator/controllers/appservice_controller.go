@@ -18,23 +18,23 @@ package controllers
 
 import (
 	"context"
-	"github.com/go-logr/logr"
 	v1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/json"
+	appv1beta1 "nginx-operator/api/v1beta1"
 	"nginx-operator/pkg/deployment"
 	service2 "nginx-operator/pkg/service"
-
-	"k8s.io/apimachinery/pkg/runtime"
-	appv1beta1 "nginx-operator/api/v1beta1"
+	"reflect"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/log"
 )
 
 // AppServiceReconciler reconciles a AppService object
 type AppServiceReconciler struct {
 	client.Client
-	Log    logr.Logger
 	Scheme *runtime.Scheme
 }
 
@@ -52,7 +52,8 @@ type AppServiceReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.11.0/pkg/reconcile
 func (r *AppServiceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	log := r.Log.WithValues("appservice", req.NamespacedName)
+	logger := log.FromContext(ctx)
+	logger.WithValues("appservice", req.NamespacedName)
 
 	var appService appv1beta1.AppService
 	err := r.Get(ctx, req.NamespacedName, &appService)
@@ -63,7 +64,7 @@ func (r *AppServiceReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{}, nil
 	}
 
-	log.Info("fetch appservice objects", "appservice", appService)
+	logger.Info("fetch appservice objects", "appservice", appService)
 
 	// 如果不存在，则创建关联资源
 	// 如果存在，判断是否需要更新
@@ -98,14 +99,39 @@ func (r *AppServiceReconciler) Reconcile(ctx context.Context, req ctrl.Request) 
 		return ctrl.Result{}, nil
 	}
 
-	// Reconcile successful - don't requeue
-	// return ctrl.Result{}, nil
-	// Reconcile failed due to error - requeue
-	// return ctrl.Result{}, nil
-	// Requeue for any reason other than an error
-	// return ctrl.Result{Requeue: true}, nil
+	oldSpec := appv1beta1.AppServiceSpec{}
+	if err := json.Unmarshal([]byte(appService.Annotations["spec"]), &oldSpec); err != nil {
+		return ctrl.Result{}, err
+	}
 
-	// TODO(user): your logic here
+	// 当前规范与旧的对象不一致，则需要更新
+	if !reflect.DeepEqual(appService.Spec, oldSpec) {
+		// 更新关联资源
+		newDeploy := deployment.NewDeploy(&appService)
+		oldDeploy := &v1.Deployment{}
+		if err := r.Get(ctx, req.NamespacedName, oldDeploy); err != nil {
+			return ctrl.Result{}, err
+		}
+
+		oldDeploy.Spec = newDeploy.Spec
+		if err := r.Client.Update(ctx, oldDeploy); err != nil {
+			return ctrl.Result{}, err
+		}
+
+		newService := service2.NewService(&appService)
+		oldService := &corev1.Service{}
+		if err := r.Get(ctx, req.NamespacedName, oldService); err != nil {
+			return ctrl.Result{}, err
+		}
+
+		newService.Spec.ClusterIP = oldService.Spec.ClusterIP
+		oldService.Spec = newService.Spec
+
+		if err := r.Client.Update(ctx, oldService); err != nil {
+			return ctrl.Result{}, err
+		}
+		return ctrl.Result{}, nil
+	}
 
 	return ctrl.Result{}, nil
 }

@@ -18,7 +18,7 @@ make manifests  # 会创建config/crd下的default文件
 
 make generate
 
-make install  # or  kubectl apply -k config/crd/
+make install  # or  kubectl apply -k config/crd/  安装crd
 ```
 
 > 可以使用 `kubectl apply -k config/crd` 生成crd文件，但是当这样使用时
