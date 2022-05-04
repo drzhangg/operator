@@ -6,7 +6,7 @@ go mod init test-operator
 
 operator-sdk init
 
-operator-sdk create api --group ship --version v1beta1 --kind Frigate
+operator-sdk create api --group drzhangg --version v1beta1 --kind Frigate
 ```
 
 
@@ -34,12 +34,17 @@ kubectl apply -k config/rbac  # 要注意提前修复对应文件里的ns和name
 
 #### 3.build镜像
 ```shell
+make docker-build
+
+make docker-push
 ```
 
 
 #### 4.创建controller manager
 ```shell
 kubectl apply -f config/manager/manager.yaml
+
+kubectl delete -f config/manager/manager.yaml
 ```
 
 

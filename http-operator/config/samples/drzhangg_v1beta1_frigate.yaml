@@ -1,0 +1,7 @@
+apiVersion: drzhangg.my.domain/v1beta1
+kind: Frigate
+metadata:
+  name: frigate-sample
+spec:
+  foo: "说点社就你们吧"
+  # TODO(user): Add fields here
