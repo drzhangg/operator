@@ -60,6 +60,10 @@ func (r *RedisReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl
 	//logger.Info("namespace", redis.Namespace)
 	fmt.Println("namespace::", redis.Namespace)
 
+	if redis.Namespace == "" {
+		redis.Namespace = "default"
+	}
+
 	// 有redis实例，对statefulSet进行创建或者更新
 	var sts v1.StatefulSet
 	//var deploy v1.Deployment
