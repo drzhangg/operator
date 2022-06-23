@@ -18,6 +18,7 @@ package v1beta1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"time"
 )
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
@@ -35,6 +36,8 @@ type RedisSpec struct {
 
 // RedisStatus defines the observed state of Redis
 type RedisStatus struct {
+	Message string `json:"message"`
+	CreateTime time.Time `json:"createTime"`
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 }

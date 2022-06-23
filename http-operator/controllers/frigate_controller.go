@@ -56,8 +56,9 @@ func (r *FrigateReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	logger.WithValues("http ", req.NamespacedName)
 
 	// TODO(user): your logic here
-	var frigate drzhanggv1beta1.Frigate
-	err := r.Get(ctx, req.NamespacedName, &frigate)
+
+	var instance drzhanggv1beta1.Frigate
+	err := r.Client.Get(ctx, req.NamespacedName, &instance)
 	if err != nil {
 		if client.IgnoreNotFound(err) != nil {
 			return ctrl.Result{}, nil
@@ -71,7 +72,7 @@ func (r *FrigateReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	fmt.Println("get:", string(gd))
 	fmt.Println("post:", string(pd))
 
-	logger.Info("fetch http operator objects", "httpservice", frigate)
+	logger.Info("fetch http operator objects", "httpservice", instance)
 
 	return ctrl.Result{}, nil
 }
@@ -108,7 +109,6 @@ func post() []byte {
 		"gender":  1,
 		"address": "上海沙田公寓24",
 	}
-
 
 	d, _ := json.Marshal(&m)
 	req, err := http.NewRequest("POST", url, bytes.NewReader(d))
