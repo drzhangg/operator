@@ -65,6 +65,7 @@ func (r *FrigateReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		}
 		return ctrl.Result{}, nil
 	}
+	fmt.Println()
 
 	gd := get()
 	pd := post()
