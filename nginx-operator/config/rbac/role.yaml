@@ -2,50 +2,67 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  creationTimestamp: null
   name: nginx-operator
 rules:
-- apiGroups:
-  - app.drzhangg.io
-  resources:
-  - appservices
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - app.drzhangg.io
-  resources:
-  - appservices/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - app.drzhangg.io
-  resources:
-  - appservices/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - ""
-  resources:
-  - "*"
-  verbs:
-  - "*"
-- apiGroups:
-    - "coordination.k8s.io"
-  resources:
-    - "*"
-  verbs:
-    - "*"
-- apiGroups:
-    - "apps"
-  resources:
-    - "*"
-  verbs:
-    - "*"
+  - apiGroups:
+      - drzhangg.my.domain
+    resources:
+      - frigates
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - drzhangg.my.domain
+    resources:
+      - frigates/finalizers
+    verbs:
+      - update
+  - apiGroups:
+      - drzhangg.my.domain
+    resources:
+      - frigates/status
+    verbs:
+      - get
+      - patch
+      - update
+  - apiGroups:
+      - ""
+    resources:
+      - "*"
+    verbs:
+      - "*"
+  - apiGroups:
+      - "coordination.k8s.io"
+    resources:
+      - "*"
+    verbs:
+      - "*"
+  - apiGroups:
+      - "app.drzhangg.io"
+    resources:
+      - "*"
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - "apps"
+    resources:
+      - "*"
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
